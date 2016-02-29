@@ -9,49 +9,46 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## Including Plots
+Research on human activity recognition research focuses to identify trend and health information from different activities. In this assignment we have to create predictor based on the provided training and testing data set.There is also potential information available at http://groupware.les.inf.puc-rio.br/har for sports training.
 
-```{}
+In this predictor model, performance of individual's assigned exercises participated by six participants will be predict. Exercises are classified as: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).
+
+Objective of this assignment is to use machine learning algorithms to predict individual performance in the exercises using measurements available from devices such as Jawbone Up, Nike FuelBand, and Fitbit.
+
+I am new at R programming and machine language algorithms. In this course, I could not able to learn necessary skills. So for this assignment, I took help from https://rpubs.com/jocaqui/26619 to complete this assignment.And I thing that I need more time to create a preditor. However, based on the reference work, I have implemented the following predictors in RStudio and got the similar result.
+
+Data Cleaning 
+
 #Data loading
 
 setwd("E:/phd/swedenphd/corsera/Machine Learning/Assignments")
 
 pmlTrain<-read.csv("pml-training.csv", header=T, na.strings=c("NA", "#DIV/0!"))
 
-pmlTest<-read.csv("pml-testing.csv", header=T, na.string=c("NA", "#DIV/0!"))}
-```
-```{}
+pmlTest<-read.csv("pml-testing.csv", header=T, na.string=c("NA", "#DIV/0!"))
+
+
+
 ## NA exclusion for all available variables
 
 noNApmlTrain<-pmlTrain[, apply(pmlTrain, 2, function(x) !any(is.na(x)))] 
-```
 
-```{}
 dim(noNApmlTrain)
-```
 
-```{}
 cleanpmlTrain<-noNApmlTrain[,-c(1:8)]
 
 dim(cleanpmlTrain)
-```
 
-```{}
 
 ## 20 test cases provided clean info - Validation data set
 
 cleanpmltest<-pmlTest[,names(cleanpmlTrain[,-52])]
-```
 
-```{}
 dim(cleanpmltest)
-```
 
-```{}
 
 #data cleaning
 
@@ -62,18 +59,13 @@ inTrain<-createDataPartition(y=cleanpmlTrain$classe, p=0.75,list=F)
 training<-cleanpmlTrain[inTrain,] 
 
 test<-cleanpmlTrain[-inTrain,]
-```
-
-```{}
 
 #Training and test set dimensions
 
 dim(training)
 
 dim(test)
-```
 
-```{}
 
 library(caret)
 
@@ -88,16 +80,14 @@ predrf<-predict(rffit, newdata=test)
 confusionMatrix(predrf, test$classe)
 
 pred20<-predict(rffit, newdata=cleanpmltest)
-```
 
-```{echo=TRUE}
 
 # Output for the prediction of the 20 cases provided
 
 pred20
-```
 
-```{}
+I could able to get 20 results as prediction. But I have to execute this predictor several times to get all the result.
+
 fitControl2<-trainControl(method="cv", number=5, allowParallel=T, verbose=T)
 
 gmbfit<-train(classe~.,data=training, method="gbm", trControl=fitControl2, verbose=F)
@@ -117,10 +107,7 @@ confusionMatrix(predtrain, training$classe)
 predtrain<-predict(gmbfit, newdata=training)
 
 confusionMatrix(predtrain, training$classe)
-```
 
-
-```{}
 
 getwd()
 
@@ -137,21 +124,12 @@ pml_write_files = function(x){
   }
 
 }
+Bellow script was used to obtain single text files to be uploaded to the courses web site to comply with the submission assigment in reference work. 20 out of 20 hits also confirmed the accuracy of the obtained models.But in my execution it did not work.
 
 pml_write_files(pred20)
 
-```
+---
+My github link is: https://github.com/sarwar-rcc/practicalmachinelearning/blob/gh-pages/index.Rmd
+---
+Conclusion: Since I am new in R and machine learning algorithms, I need more time to create predictor model.
 
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
