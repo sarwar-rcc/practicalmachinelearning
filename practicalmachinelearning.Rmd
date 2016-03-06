@@ -1,0 +1,164 @@
+<html>
+
+<head>
+<title>Title</title>
+</head>
+
+<body>
+
+<p>This is an R HTML document. When you click the <b>Knit HTML</b> button a web page will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+
+<!--begin.rcode-->
+#summary(cars)
+
+```{r}
+# Load the file
+setwd("D:/PhD/corsera/Machine Learning/Assignments")
+trainingData = read.csv("pml-training.csv", na.strings=c("", "NA", "NULL"))
+testingData = read.csv("pml-testing.csv", na.strings=c("", "NA", "NULL"))
+```
+
+```{r}
+dim(trainingData)
+```
+
+```{r}
+dim(testingData)
+```
+
+```{r}
+train.dena<-trainingData[,colSums(is.na(trainingData)) == 0]
+dim(train.dena)
+```
+
+```{r}
+ remove = c('X', 'user_name', 'raw_timestamp_part_1', 'raw_timestamp_part_2', 'cvtd_timestamp', 'new_window', 'num_window')
+```
+ 
+```{r}
+train.dare <- train.dena[,-which(names(train.dena) %in% remove)]
+```
+ 
+```{r}
+ dim(train.dare)
+```
+ 
+```{r}
+ library(lattice)
+library(ggplot2)
+library(caret)
+zeroVar= nearZeroVar(train.dare[sapply(train.dare, is.numeric)], saveMetrics = TRUE)
+train.nonzerovar = train.dare[,zeroVar[, 'nzv']==0]
+dim(train.nonzerovar)
+```
+
+```{r}
+corrMatrix <- cor(na.omit(train.nonzerovar[sapply(train.nonzerovar, is.numeric)]))
+dim(corrMatrix)
+```
+
+```{r}
+corrDF <- expand.grid(row = 1:52, col = 1:52)
+corrDF$correlation <- as.vector(corrMatrix)
+levelplot(correlation ~ row+ col, corrDF)
+removecor = findCorrelation(corrMatrix, cutoff = .90, verbose = TRUE)
+
+```
+
+```{r}
+train.decor = train.nonzerovar[,-removecor]
+dim(train.decor)
+```
+
+```{r}
+inTrain <- createDataPartition(y=train.decor$classe, p=0.7, list=FALSE)
+train <- train.decor[inTrain,]; testing <- train.decor[-inTrain,]
+dim(train);
+```
+
+```{r}
+dim(testing)
+```
+
+```{r}
+library(tree)
+set.seed(12345)
+tree.train=tree(classe~.,data=train)
+summary(tree.train)
+```
+
+```{r}
+plot(tree.train)
+text(tree.train,pretty=0, cex =.8)
+library(caret)
+modFit <- train(classe ~ .,method="rpart",data=train)
+print(modFit$finalModel)
+```
+
+```{r}
+library(rattle)
+```
+
+```{r}
+fancyRpartPlot(modFit$finalModel)
+tree.pred=predict(tree.train,testing,type="class")
+predMatrix = with(testing,table(tree.pred,classe))
+sum(diag(predMatrix))/sum(as.vector(predMatrix))
+```
+
+```{r}
+tree.pred=predict(modFit,testing)
+predMatrix = with(testing,table(tree.pred,classe))
+sum(diag(predMatrix))/sum(as.vector(predMatrix))
+```
+
+```{r}
+cv.train=cv.tree(tree.train,FUN=prune.misclass)
+cv.train
+```
+
+
+<!--end.rcode-->
+
+<p>You can also embed plots, for example:</p>
+```{r}
+plot(cv.train)
+```
+
+```{r}
+prune.train=prune.misclass(tree.train,best=18)
+tree.pred=predict(prune.train,testing,type="class")
+predMatrix = with(testing,table(tree.pred,classe))
+sum(diag(predMatrix))/sum(as.vector(predMatrix))
+```
+
+```{r}
+require(randomForest)
+```
+
+```{r}
+set.seed(12345)
+rf.train=randomForest(classe~.,data=train,ntree=100, importance=TRUE)
+rf.train
+```
+
+
+```{r}
+varImpPlot(rf.train,)
+tree.pred=predict(rf.train,testing,type="class")
+predMatrix = with(testing,table(tree.pred,classe))
+sum(diag(predMatrix))/sum(as.vector(predMatrix))
+```
+
+```{r}
+
+predictors <- predict(rf.train, testingData)
+predictors 
+```
+
+<!--begin.rcode fig.width=7, fig.height=6
+plot(cars)
+end.rcode-->
+
+</body>
+</html>
