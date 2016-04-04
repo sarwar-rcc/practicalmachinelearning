@@ -1,21 +1,67 @@
 <html>
 
 <head>
-<title>Title</title>
+<title>Practical Machine Learning</title>
 </head>
 
 <body>
 
-<p>This is an R HTML document. When you click the <b>Knit HTML</b> button a web page will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+## Introduction
+
+Research on human activity recognition research focuses to identify trend and health information from different activities. People take their daily exercise using different exercise tools in order to improve their health. Devices such as Jawbone Up, Nike FuelBand, and Fitbit can be used for collecting large amount of data from an individual while doing exercise.  Further analysis of this large amount of data can tell about the personal activity of an individual with a small cost. Usually enthusiastic individuals use these devices to follow up their health improvement. Further information for instance behavior analysis of the individual can also be measured from this data set. Previous data shows that people regularly measure how much particular they do. In this project, we have used data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. These participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. Details of this data can be found at the website:
+
+http://groupware.les.inf.puc-rio.br/har.
+
+## Given Data Set
+
+The training data for this project are available in the following links and I downloaded them in my working directory:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+## Goal of this project
+
+Goal of this project is to create a prediction model to understand how the participants did the exercise. In this predictor model, performance of individual's assigned exercises participated by six participants will be predict. This is the classe variable of the training set, which classifies the correct and incorrect outcomes into A, B, C, D, and E categories. Exercises are classified as: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E). After this exercise we have to made a report that describes how the model for the project was built, its cross validation, expected out of sample error calculation, and the choices made.
+
+## Github Link
+
+My github link is: 
+https://github.com/sarwar-rcc/practicalmachinelearning
+
+## rPub Link
+
+http://rpubs.com/msjmo/158809
 
 <!--begin.rcode-->
-#summary(cars)
+
+## Details Steps of Predictor
 
 ```{r}
 # Load the file
 setwd("D:/PhD/corsera/Machine Learning/Assignments")
 trainingData = read.csv("pml-training.csv", na.strings=c("", "NA", "NULL"))
 testingData = read.csv("pml-testing.csv", na.strings=c("", "NA", "NULL"))
+```
+
+```{r}
+# We take a quick look at the data and particularly at classe which is the variable we need to predict:
+str(trainingData, list.len=15)
+```
+
+```{r}
+table(trainingData$classe)
+```
+
+
+```{r}
+prop.table(table(trainingData$user_name, trainingData$classe), 1)
+```
+
+```{r}
+prop.table(table(trainingData$classe))
 ```
 
 ```{r}
@@ -120,7 +166,7 @@ cv.train
 
 <!--end.rcode-->
 
-<p>You can also embed plots, for example:</p>
+
 ```{r}
 plot(cv.train)
 ```
@@ -131,6 +177,9 @@ tree.pred=predict(prune.train,testing,type="class")
 predMatrix = with(testing,table(tree.pred,classe))
 sum(diag(predMatrix))/sum(as.vector(predMatrix))
 ```
+
+## Data Manipulation
+53 covariates is a lot of variables… Let’s look at their relative importance using the output of a quick Random Forest algorithm (which we call directly using randomForest() rather than the caret package purely for speed purposes as we cannot specify the number of trees to use in caret), and plotting data importance using varImpPlot(). Confusion matrix is also used for getting the idea about accuracy.
 
 ```{r}
 require(randomForest)
@@ -150,15 +199,17 @@ predMatrix = with(testing,table(tree.pred,classe))
 sum(diag(predMatrix))/sum(as.vector(predMatrix))
 ```
 
+##Result of the Project Assignment
+
+Finally prediction result  of the project assignment is derived 
 ```{r}
 
 predictors <- predict(rf.train, testingData)
 predictors 
 ```
 
-<!--begin.rcode fig.width=7, fig.height=6
-plot(cars)
-end.rcode-->
+## Conclusion
+Since I am new in R and machine learning algorithms, I need more time to create a better predictor model.I took help from different prediction model available in online to have better understanding about the  prediction model. And I hope I will do better in the next courses in this data science seriese. 
 
 </body>
 </html>
